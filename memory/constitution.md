@@ -93,6 +93,122 @@ const props = defineProps({
 </style>
 ```
 
+### defineEmits Convention
+
+**Always use object syntax for `defineEmits`**:
+
+```vue
+<!-- ❌ Плохо -->
+<script setup>
+defineEmits(["select"]);
+</script>
+
+<!-- ✅ Хорошо -->
+<script setup>
+defineEmits({
+  select: null,
+});
+</script>
+```
+
+Object syntax provides better type inference and allows for payload validation in the future.
+
+### Icons Convention
+
+**Always use `FFIcon` component for icons**:
+
+```vue
+<!-- ❌ Плохо -->
+<template>
+  <ChevronRightIcon class="chevron-icon" />
+</template>
+
+<!-- ✅ Хорошо -->
+<template>
+  <FFIcon name="icons/common/chevronRight" class="chevron-icon" />
+</template>
+```
+
+`FFIcon` provides a unified API for icons, supports lazy loading, and ensures consistent icon usage across the project.
+
+### No Magic Strings/Numbers
+
+**Avoid magic strings and numbers — always use constants**:
+
+```typescript
+// ❌ Плохо
+const modes = items.filter((item) => item.name !== "LIVENESS");
+
+if (mode === "SMS") {
+  // ...
+}
+
+// ✅ Хорошо
+// Derive constants from types when possible
+type DeliveryAuthCodeMode = "SMS" | "FLASH_CALL" | "LIVENESS";
+
+const DELIVERY_MODES: Record<DeliveryAuthCodeMode, DeliveryAuthCodeMode> = {
+  SMS: "SMS",
+  FLASH_CALL: "FLASH_CALL",
+  LIVENESS: "LIVENESS",
+};
+
+const modes = items.filter((item) => item.name !== DELIVERY_MODES.LIVENESS);
+
+if (mode === DELIVERY_MODES.SMS) {
+  // ...
+}
+```
+
+Using constants:
+
+- Improves code readability and maintainability
+- Provides IDE autocompletion and type safety
+- Makes refactoring safer (single point of change)
+- Prevents typos in string values
+
+### DRY (Don't Repeat Yourself)
+
+**Avoid duplicating code — extract into reusable functions**:
+
+```typescript
+// ❌ Плохо — дублирование логики
+async function onPhoneNext(data) {
+  const phone = state.phoneNumber.startsWith("+")
+    ? state.phoneNumber
+    : `+${state.phoneNumber}`;
+  await requestModes({ phone });
+}
+
+async function sendSms() {
+  const tel = state.phoneNumber.startsWith("+")
+    ? state.phoneNumber
+    : `+${state.phoneNumber}`;
+  await requestSms({ tel });
+}
+
+// ✅ Хорошо — логика вынесена в helper
+function getFormattedPhone() {
+  return state.phoneNumber.startsWith("+")
+    ? state.phoneNumber
+    : `+${state.phoneNumber}`;
+}
+
+async function onPhoneNext(data) {
+  await requestModes({ phone: getFormattedPhone() });
+}
+
+async function sendSms() {
+  await requestSms({ tel: getFormattedPhone() });
+}
+```
+
+Benefits:
+
+- Single point of change
+- Easier testing
+- Reduced bug surface
+
 ### Naming Conventions
 
 - **FSD Directory (`fsd/`)**: All files must use **kebab-case** notation (e.g., `user-profile.vue`, `use-environment.js`).
