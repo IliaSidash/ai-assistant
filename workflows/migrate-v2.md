@@ -21,6 +21,7 @@ Usage: `/migrate-v2 [TD-ID]` (e.g., `/migrate-v2 TD-MIG-102`)
    - Use **Vue 2.7 Composition API** standards established in `.agent/memory/migration-guide.md`.
    - Use `$slots` directly in the template for optional slots (e.g., `v-if="$slots.header"`).
    - Use minimal `<script setup>` for event emissions and essential logic.
+   - Register the component in `frontend/fsd/app/vue-plugins/mobile-components-registry/index.ts`.
 
 3. **Legacy Cleanup**
    - Delete the legacy `.js` file from `public/javascripts/app/mobile/components/`.
